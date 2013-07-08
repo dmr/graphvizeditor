@@ -1,5 +1,5 @@
-Graphviz-prototyping-helper
-===========================
+graphvizeditor
+==============
 
 I was annoyed because writing graphviz graphs was painful,
 but thanks to vis.js and <a href="https://github.com/kripken/emscripten">emscripten</a> everything can be done in the browser.
@@ -13,7 +13,7 @@ It works good with the simpler examples but has problems with radial layout. You
 Online Demo
 -----------
 
-Have a look at https://dmr.github.io/graphvizeditor.html
+Have a look at http://dmr.github.io/graphvizeditor.html
 
 
 Credits
