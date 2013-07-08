@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>graphvizeditor</title>
+    <script src="viz.js"></script>
+    <script src="Behave.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+<style>
+.container {
+    overflow: hidden;
+}
+
+h2, p {
+    padding: 5px;
+}
+
+.container .left {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    vertical-align: text-top;
+    display: block;
+    background-color:lightgrey;
+}
+.container .right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 60%;
+    display: block;
+}
+
+textarea {
+    margin: 5px;
+    font-family: monospace;
+    box-sizing: border-box;
+    width: 98%;
+    height: 75%;
+}
+</style>
+
+  </head>
+  <body>
+    <div class="container">
+        <div class="left">
+            <h1>graphvizeditor</h1>
+            <h2>An editor to write graphviz code</h2>
+            <h3>Code</h3>
+            <p>Enter your <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language)">.dot</a> code in the textarea, leave the focus to recalculate the graph and watch the result on the right page.</p>
+            <textarea id="the_textarea" data-bind="value: dot_src"></textarea>
+        </div>
+        <div class="right">
+            <h2>Graph</h2>
+            <!-- ko if: loading() -->
+                <img src="loader.gif"/>
+            <!-- /ko -->
+            <div data-bind="html: result"></div>
+
+            <p>
+                I was annoyed because writing graphviz graphs was painful, but thanks to vis.js and <a href="https://github.com/kripken/emscripten">emscripten</a> everything can be done in the browser. This is the first idea of a quick prototyping page for graphs. Just copy the examples from the <a href="http://www.graphviz.org/Gallery.php">graphviz Gallery</a> into the text editor and enjoy :). It works good with the simpler examples but has problems with radial layout. Your Browser might hang for a little because everything is rendered on the client.
+            </p>
+            <p>
+                <a href="https://github.com/dmr/graphvizeditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+                This page was made using <a href="https://github.com/mdaines/viz.js">viz.js</a> and <a href="http://knockoutjs.com/">knockoutjs</a> and <a href="http://jakiestfu.github.io/Behave.js/">Behave.js</a>.
+            </p>
+        </div>
+    </div>
+
+<script type="text/vnd.graphviz" id="example">
+digraph ER {
+    {node [shape=box, style=rounded] ".dot code";};
+    {node [shape=hexagon,style=filled,color=lightgrey,label="emscripten\nMagic"] ku_e;};
+    {node [shape=box, style=rounded] "svg Graph :)";};
+    ".dot code" -> "viz.js";
+    "viz.js" -> "viz.c";
+    "viz.c" -> ku_e;
+    ku_e -> "svg Graph :)";
+}
+</script>
+
+    <script>
+      function inspect(s) {
+        return "<pre>" + s.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") + "</pre>"
+      }
+
+      function src(id) {
+        return document.getElementById(id).innerHTML;
+      }
+
+      function render_graph(dot_src, format) {
+        var result;
+        try {
+          result = Viz(dot_src, format);
+          if (format === "svg")
+            return result;
+          else
+            return inspect(result);
+        } catch(e) {
+          return inspect(e.toString());
+        }
+      }
+
+    // really lazy "$.ready"
+    var checkLoad = function() {
+        document.readyState !== "complete" ? setTimeout(checkLoad, 11) : function(){
+            var editor = new Behave({
+                textarea: document.getElementById('the_textarea'),
+                replaceTab: true,
+                softTabs: true,
+                tabSize: 4,
+                autoOpen: true,
+                overwrite: true,
+                autoStrip: true,
+                autoIndent: true,
+                fence: false
+            });
+            var vm = {
+                'dot_src': ko.observable(),
+                'result': ko.observable(),
+                'loading': ko.observable(false)
+            };
+            ko.applyBindings(vm);
+            vm.dot_src.subscribe(function(newValue) {
+                vm.loading(true);
+                setTimeout(function() {
+                    vm.result(render_graph(newValue, "svg"));
+                    vm.loading(false);
+                }, 0);
+            });
+            setTimeout(function() {
+                vm.dot_src(src('example'));
+            }, 500);
+        }();
+    };
+    checkLoad();
+    </script>
+
+  </body>
+</html>
