@@ -23,3 +23,5 @@ This page was made using viz.js (https://github.com/mdaines/viz.js)
 and knockoutjs (http://knockoutjs.com/)
 and Behave.js (http://jakiestfu.github.io/Behave.js/),
 I just combined them.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dmr/graphvizeditor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
